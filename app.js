@@ -1,10 +1,31 @@
 // Application State
 var history = [];
 
+// Clear comment function
+function clearComment() {
+    var errorCommentEl = document.getElementById('errorComment');
+    var charCountEl = document.getElementById('charCount');
+    var resultCard = document.getElementById('resultCard');
+    
+    if (errorCommentEl) {
+        errorCommentEl.value = '';
+        errorCommentEl.focus();
+    }
+    if (charCountEl) {
+        charCountEl.textContent = '0';
+    }
+    if (resultCard) {
+        resultCard.classList.add('hidden');
+    }
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        document.getElementById('totalCategories').textContent = ERROR_CATEGORIES.length;
+        var totalCategoriesEl = document.getElementById('totalCategories');
+        if (totalCategoriesEl) {
+            totalCategoriesEl.textContent = ERROR_CATEGORIES.length;
+        }
         
         // Character count
         var errorCommentEl = document.getElementById('errorComment');

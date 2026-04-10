@@ -152,6 +152,123 @@
                 return new Date().getTime();
             };
         }
+        
+        // Polyfill for classList (IE9/Edge Legacy)
+        if (!('classList' in document.createElement('_'))) {
+            (function(view) {
+                if (!('Element' in view)) return;
+                var classListProp = 'classList',
+                    protoProp = 'prototype',
+                    elemCtrProto = view.Element[protoProp],
+                    objCtr = Object,
+                    strTrim = String[protoProp].trim || function() {
+                        return this.replace(/^\s+|\s+$/g, '');
+                    },
+                    arrIndexOf = Array[protoProp].indexOf || function(item) {
+                        var i = 0, len = this.length;
+                        for (; i < len; i++) {
+                            if (i in this && this[i] === item) {
+                                return i;
+                            }
+                        }
+                        return -1;
+                    },
+                    DOMTokenList = function(elem) {
+                        var classes = strTrim.call(elem.getAttribute('class') || ''),
+                            trimmedClasses = classes ? classes.split(/\s+/) : [],
+                            i = 0,
+                            len = trimmedClasses.length;
+                        for (; i < len; i++) {
+                            this.push(trimmedClasses[i]);
+                        }
+                        this._updateClassName = function() {
+                            elem.setAttribute('class', this.toString());
+                        };
+                    },
+                    classListProto = DOMTokenList[protoProp] = [],
+                    classListGetter = function() {
+                        return new DOMTokenList(this);
+                    };
+                DOMTokenList[protoProp].item = function(i) {
+                    return this[i] || null;
+                };
+                DOMTokenList[protoProp].contains = function(token) {
+                    token += '';
+                    return arrIndexOf.call(this, token) !== -1;
+                };
+                DOMTokenList[protoProp].add = function() {
+                    var tokens = arguments, i = 0, l = tokens.length, token, updated = false;
+                    do {
+                        token = tokens[i] + '';
+                        if (arrIndexOf.call(this, token) === -1) {
+                            this.push(token);
+                            updated = true;
+                        }
+                    } while (++i < l);
+                    if (updated) {
+                        this._updateClassName();
+                    }
+                };
+                DOMTokenList[protoProp].remove = function() {
+                    var tokens = arguments, i = 0, l = tokens.length, token, updated = false, index;
+                    do {
+                        token = tokens[i] + '';
+                        index = arrIndexOf.call(this, token);
+                        while (index !== -1) {
+                            this.splice(index, 1);
+                            updated = true;
+                            index = arrIndexOf.call(this, token);
+                        }
+                    } while (++i < l);
+                    if (updated) {
+                        this._updateClassName();
+                    }
+                };
+                DOMTokenList[protoProp].toggle = function(token, force) {
+                    token += '';
+                    var result = this.contains(token),
+                        method = result ? force !== true && 'remove' : force !== false && 'add';
+                    if (method) {
+                        this[method](token);
+                    }
+                    if (force === true || force === false) {
+                        return force;
+                    } else {
+                        return !result;
+                    }
+                };
+                DOMTokenList[protoProp].toString = function() {
+                    return this.join(' ');
+                };
+                if (objCtr.defineProperty) {
+                    var classListPropDesc = {
+                        get: classListGetter,
+                        enumerable: true,
+                        configurable: true
+                    };
+                    try {
+                        objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
+                    } catch (ex) {
+                        if (ex.number === -0x7FF5EC54) {
+                            classListPropDesc.enumerable = false;
+                            objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
+                        }
+                    }
+                }
+            }(window));
+        }
+        
+        // Edge-specific fix for textContent
+        if (!('textContent' in document.createElement('_'))) {
+            Object.defineProperty(Element.prototype, 'textContent', {
+                get: function() {
+                    return this.innerText;
+                },
+                set: function(value) {
+                    this.innerText = value;
+                }
+            });
+        }
     </script>
     <style>
         /* Reset and base styles */
@@ -296,9 +413,21 @@
                     ></textarea>
 
                     <div class="flex items-center justify-between mt-4">
-                        <p class="text-sm text-gray-500">
-                            <span id="charCount">0</span> characters
-                        </p>
+                        <div class="flex items-center gap-4">
+                            <p class="text-sm text-gray-500">
+                                <span id="charCount">0</span> characters
+                            </p>
+                            <button
+                                id="clearBtn"
+                                onclick="clearComment()"
+                                class="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                Clear
+                            </button>
+                        </div>
                         <button
                             id="analyzeBtn"
                             onclick="analyzeError()"
