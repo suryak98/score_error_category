@@ -1,5 +1,5 @@
 // Error Categories - 126 total
-const ERROR_CATEGORIES = [
+var ERROR_CATEGORIES = [
     "ACU-Embedded/Non Embedded",
     "ACU-Incorrect Year/Contract/Member Worked",
     "ACU-ODS/LITES OOS",
