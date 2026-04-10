@@ -176,9 +176,15 @@ function analyzeErrorComment(errorComment) {
     // Generate reasoning
     var reasoning = "Matched based on keyword analysis and pattern recognition. ";
     var topDesc = topCategory.split('-').slice(1).join('-');
-    var hasKeywordMatch = keywords.some(function(kw) {
-        return topDesc.toLowerCase().includes(kw);
-    });
+    
+    // Check for keyword match (IE11 compatible)
+    var hasKeywordMatch = false;
+    for (var k = 0; k < keywords.length; k++) {
+        if (topDesc.toLowerCase().indexOf(keywords[k]) !== -1) {
+            hasKeywordMatch = true;
+            break;
+        }
+    }
     
     if (hasKeywordMatch) {
         reasoning += "Found direct keyword matches in category description. ";
@@ -224,12 +230,30 @@ function analyzeError() {
     // Simulate processing delay for better UX
     setTimeout(function() {
         try {
+            // Validate categories are loaded
+            if (!ERROR_CATEGORIES || ERROR_CATEGORIES.length === 0) {
+                throw new Error('Categories not loaded');
+            }
+            
             var result = analyzeErrorComment(errorComment);
+            
+            // Validate result
+            if (!result || !result.category) {
+                throw new Error('Invalid analysis result');
+            }
+            
             displayResult(result, errorComment);
             addToHistory(result, errorComment);
         } catch (error) {
-            displayError('Analysis failed. Please try again.');
-            console.error('Analysis error:', error);
+            var errorMsg = 'Analysis failed. Please try again.';
+            if (error && error.message) {
+                console.error('Analysis error:', error.message);
+                // Show more specific error in development
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    errorMsg = 'Error: ' + error.message;
+                }
+            }
+            displayError(errorMsg);
         } finally {
             if (btn) btn.disabled = false;
             if (btnText) btnText.textContent = 'Analyze Error';

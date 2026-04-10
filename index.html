@@ -16,13 +16,69 @@
     
     <!-- Polyfills for older browsers -->
     <script>
+        // Polyfill for console (IE9)
+        if (!window.console) {
+            window.console = {
+                log: function() {},
+                error: function() {},
+                warn: function() {},
+                info: function() {}
+            };
+        }
+        
         // Polyfill for Array.from (IE11)
         if (!Array.from) {
             Array.from = function(arrayLike) {
                 return Array.prototype.slice.call(arrayLike);
             };
         }
-        // Polyfill for String.includes (IE11)
+        
+        // Polyfill for Array.prototype.filter (IE8)
+        if (!Array.prototype.filter) {
+            Array.prototype.filter = function(callback, thisArg) {
+                var arr = [];
+                for (var i = 0; i < this.length; i++) {
+                    if (callback.call(thisArg, this[i], i, this)) {
+                        arr.push(this[i]);
+                    }
+                }
+                return arr;
+            };
+        }
+        
+        // Polyfill for Array.prototype.map (IE8)
+        if (!Array.prototype.map) {
+            Array.prototype.map = function(callback, thisArg) {
+                var arr = [];
+                for (var i = 0; i < this.length; i++) {
+                    arr.push(callback.call(thisArg, this[i], i, this));
+                }
+                return arr;
+            };
+        }
+        
+        // Polyfill for Array.prototype.forEach (IE8)
+        if (!Array.prototype.forEach) {
+            Array.prototype.forEach = function(callback, thisArg) {
+                for (var i = 0; i < this.length; i++) {
+                    callback.call(thisArg, this[i], i, this);
+                }
+            };
+        }
+        
+        // Polyfill for Array.prototype.some (IE8)
+        if (!Array.prototype.some) {
+            Array.prototype.some = function(callback, thisArg) {
+                for (var i = 0; i < this.length; i++) {
+                    if (callback.call(thisArg, this[i], i, this)) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+        }
+        
+        // Polyfill for String.prototype.includes (IE11)
         if (!String.prototype.includes) {
             String.prototype.includes = function(search, start) {
                 if (typeof start !== 'number') start = 0;
@@ -30,12 +86,54 @@
                 return this.indexOf(search, start) !== -1;
             };
         }
-        // Polyfill for Array.includes (IE11)
+        
+        // Polyfill for String.prototype.trim (IE8)
+        if (!String.prototype.trim) {
+            String.prototype.trim = function() {
+                return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+            };
+        }
+        
+        // Polyfill for Array.prototype.includes (IE11)
         if (!Array.prototype.includes) {
             Array.prototype.includes = function(searchElement) {
                 return this.indexOf(searchElement) !== -1;
             };
-            }
+        }
+        
+        // Polyfill for Array.prototype.indexOf (IE8)
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function(searchElement, fromIndex) {
+                var k;
+                if (this == null) throw new TypeError();
+                var O = Object(this);
+                var len = O.length >>> 0;
+                if (len === 0) return -1;
+                var n = +fromIndex || 0;
+                if (Math.abs(n) === Infinity) n = 0;
+                if (n >= len) return -1;
+                k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+                while (k < len) {
+                    if (k in O && O[k] === searchElement) return k;
+                    k++;
+                }
+                return -1;
+            };
+        }
+        
+        // Polyfill for Object.keys (IE8)
+        if (!Object.keys) {
+            Object.keys = function(obj) {
+                var keys = [];
+                for (var k in obj) {
+                    if (Object.prototype.hasOwnProperty.call(obj, k)) {
+                        keys.push(k);
+                    }
+                }
+                return keys;
+            };
+        }
+        
         // Polyfill for Object.entries (IE11)
         if (!Object.entries) {
             Object.entries = function(obj) {
@@ -45,6 +143,13 @@
                 while (i--)
                     resArray[i] = [ownProps[i], obj[ownProps[i]]];
                 return resArray;
+            };
+        }
+        
+        // Polyfill for Date.now (IE8)
+        if (!Date.now) {
+            Date.now = function() {
+                return new Date().getTime();
             };
         }
     </script>
