@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Categorization Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-clamp: 2;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Configuration Panel -->
+    <div id="configPanel" class="fixed top-4 right-4 z-50">
+        <button onclick="toggleConfig()" class="px-4 py-2 bg-gray-700 text-white rounded-lg shadow-lg hover:bg-gray-800 text-sm">
+            ⚙️ Settings
+        </button>
+        <div id="configMenu" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 p-4">
+            <h3 class="font-bold text-gray-900 mb-3">Backend Server Configuration</h3>
+            <label class="block text-sm text-gray-700 mb-2">Server Address:</label>
+            <input
+                type="text"
+                id="serverConfig"
+                placeholder="e.g., 30.239.132.243 or localhost"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3"
+            />
+            <button onclick="saveConfig()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                Save & Connect
+            </button>
+            <p class="text-xs text-gray-500 mt-2">
+                Current: <span id="currentServer" class="font-mono">Not configured</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-blue-700 shadow-md border-b-2 border-blue-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-blue-600 rounded-lg">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-white">Error Categorization Portal</h1>
+                    <p class="text-sm text-blue-100 mt-1">AI-Powered Error Analysis & Classification (126 Categories)</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Connection Status Banner -->
+    <div id="statusBanner" class="hidden"></div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column - Input & Analysis -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Input Card -->
+                <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-900">Enter Error Comment</h2>
+                    </div>
+                    
+                    <textarea
+                        id="errorComment"
+                        placeholder="Paste or type the error comment here for analysis..."
+                        class="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all"
+                    ></textarea>
+
+                    <div class="flex items-center justify-between mt-4">
+                        <p class="text-sm text-gray-500">
+                            <span id="charCount">0</span> characters
+                        </p>
+                        <button
+                            id="analyzeBtn"
+                            onclick="analyzeError()"
+                            class="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium shadow-sm"
+                        >
+                            <svg id="sendIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                            <svg id="loadingIcon" class="w-5 h-5 animate-spin hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span id="btnText">Analyze Error</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Result Card -->
+                <div id="resultCard" class="bg-white rounded-lg shadow-md border border-gray-200 p-6 hidden">
+                    <div id="resultContent"></div>
+                </div>
+            </div>
+
+            <!-- Right Column - Info & History -->
+            <div class="space-y-6">
+                <!-- Stats Card -->
+                <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900">Statistics</h3>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg border border-blue-100">
+                            <span class="text-sm text-gray-700 font-medium">Total Categories</span>
+                            <span id="totalCategories" class="text-2xl font-bold text-blue-700">126</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-100">
+                            <span class="text-sm text-gray-700 font-medium">Analyses Today</span>
+                            <span id="analysisCount" class="text-2xl font-bold text-green-700">0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <span class="text-sm text-gray-700 font-medium">Status</span>
+                            <span id="statusText" class="text-sm font-bold text-yellow-600">Not Connected</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Card -->
+                <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900">Recent Analyses</h3>
+                    </div>
+                    
+                    <div id="historyList" class="space-y-3">
+                        <p class="text-sm text-gray-500 text-center py-8">No analyses yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Configuration
+        let API_BASE_URL = '';
+        let history = [];
+
+        // Load saved configuration
+        function loadConfig() {
+            const saved = localStorage.getItem('errorPortalServer');
+            if (saved) {
+                API_BASE_URL = `http://${saved}:5000/api`;
+                document.getElementById('serverConfig').value = saved;
+                document.getElementById('currentServer').textContent = saved;
+                checkConnection();
+            } else {
+                showConfigPrompt();
+            }
+        }
+
+        function showConfigPrompt() {
+            const banner = document.getElementById('statusBanner');
+            banner.className = 'bg-yellow-50 border-b-2 border-yellow-200 p-4';
+            banner.style.background = '';
+            banner.innerHTML = `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <p class="text-sm font-medium text-yellow-800">
+                            Please configure the backend server address. Click Settings (⚙️) in the top right.
+                        </p>
+                    </div>
+                </div>
+            `;
+            banner.classList.remove('hidden');
+        }
+
+        function toggleConfig() {
+            const menu = document.getElementById('configMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function saveConfig() {
+            const server = document.getElementById('serverConfig').value.trim();
+            if (!server) {
+                alert('Please enter a server address');
+                return;
+            }
+
+            localStorage.setItem('errorPortalServer', server);
+            API_BASE_URL = `http://${server}:5000/api`;
+            document.getElementById('currentServer').textContent = server;
+            document.getElementById('configMenu').classList.add('hidden');
+            
+            checkConnection();
+        }
+
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                const data = await response.json();
+                
+                const banner = document.getElementById('statusBanner');
+                banner.className = 'bg-green-50 border-b-2 border-green-200 p-4';
+                banner.style.background = '';
+                banner.innerHTML = `
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-sm font-medium text-green-800">
+                                Connected to backend server • ${data.categories_loaded} categories loaded
+                            </p>
+                        </div>
+                    </div>
+                `;
+                banner.classList.remove('hidden');
+                document.getElementById('statusText').textContent = 'Connected';
+                document.getElementById('statusText').className = 'text-sm font-bold text-green-600';
+                
+                loadStats();
+            } catch (error) {
+                const banner = document.getElementById('statusBanner');
+                banner.className = 'bg-red-50 border-b-2 border-red-200 p-4';
+                banner.style.background = '';
+                banner.innerHTML = `
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-sm font-medium text-red-800">
+                                Cannot connect to backend server. Please check server address in Settings.
+                            </p>
+                        </div>
+                    </div>
+                `;
+                banner.classList.remove('hidden');
+                document.getElementById('statusText').textContent = 'Disconnected';
+                document.getElementById('statusText').className = 'text-sm font-bold text-red-600';
+            }
+        }
+
+        // Character count
+        document.getElementById('errorComment').addEventListener('input', function(e) {
+            document.getElementById('charCount').textContent = e.target.value.length;
+        });
+
+        // Enter key to submit
+        document.getElementById('errorComment').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                analyzeError();
+            }
+        });
+
+        async function analyzeError() {
+            if (!API_BASE_URL) {
+                alert('Please configure the backend server first (click Settings)');
+                return;
+            }
+
+            const errorComment = document.getElementById('errorComment').value.trim();
+            
+            if (!errorComment) {
+                return;
+            }
+
+            const btn = document.getElementById('analyzeBtn');
+            const btnText = document.getElementById('btnText');
+            const sendIcon = document.getElementById('sendIcon');
+            const loadingIcon = document.getElementById('loadingIcon');
+            
+            btn.disabled = true;
+            btnText.textContent = 'Analyzing...';
+            sendIcon.classList.add('hidden');
+            loadingIcon.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ error_comment: errorComment })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResult(data, errorComment);
+                    addToHistory(data, errorComment);
+                } else {
+                    displayError(data.error || 'Analysis failed');
+                }
+            } catch (error) {
+                displayError(`Failed to connect to server. Please check Settings and ensure backend is running.`);
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'Analyze Error';
+                sendIcon.classList.remove('hidden');
+                loadingIcon.classList.add('hidden');
+            }
+        }
+
+        function displayResult(data, comment) {
+            const resultCard = document.getElementById('resultCard');
+            const resultContent = document.getElementById('resultContent');
+            
+            const confidenceColor = data.confidence >= 80 ? 'green' : data.confidence >= 60 ? 'yellow' : 'orange';
+            const confidenceBg = data.confidence >= 80 ? 'bg-green-100' : data.confidence >= 60 ? 'bg-yellow-100' : 'bg-orange-100';
+            const confidenceText = data.confidence >= 80 ? 'text-green-600' : data.confidence >= 60 ? 'text-yellow-600' : 'text-orange-600';
+
+            let alternativesHtml = '';
+            if (data.alternative_categories && data.alternative_categories.length > 0) {
+                alternativesHtml = `
+                    <div class="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                        <p class="text-sm font-semibold text-purple-900 mb-2">Alternative Categories</p>
+                        <ul class="space-y-1">
+                            ${data.alternative_categories.map(alt => `
+                                <li class="text-sm text-purple-700 flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 bg-purple-400 rounded-full"></span>
+                                    ${alt}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            resultContent.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-900">Analysis Complete</h2>
+                    </div>
+
+                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p class="text-sm font-semibold text-blue-900 mb-2">Assigned Category</p>
+                        <p class="text-lg font-bold text-blue-700">${data.category}</p>
+                    </div>
+
+                    <div class="p-4 ${confidenceBg} border rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-sm font-medium text-gray-900">Confidence Score</p>
+                            <span class="text-2xl font-bold ${confidenceText}">${data.confidence}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="h-2 rounded-full transition-all ${confidenceColor === 'green' ? 'bg-green-600' : confidenceColor === 'yellow' ? 'bg-yellow-600' : 'bg-orange-600'}" style="width: ${data.confidence}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                        <p class="text-sm font-semibold text-gray-900 mb-2">Analysis Reasoning</p>
+                        <p class="text-sm text-gray-700 leading-relaxed">${data.reasoning}</p>
+                    </div>
+
+                    ${alternativesHtml}
+                </div>
+            `;
+
+            resultCard.classList.remove('hidden');
+        }
+
+        function displayError(message) {
+            const resultCard = document.getElementById('resultCard');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultContent.innerHTML = `
+                <div class="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <svg class="w-5 h-5 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <h3 class="font-semibold text-red-900">Analysis Failed</h3>
+                        <p class="text-sm text-red-700 mt-1">${message}</p>
+                    </div>
+                </div>
+            `;
+
+            resultCard.classList.remove('hidden');
+        }
+
+        function addToHistory(data, comment) {
+            const item = {
+                category: data.category,
+                comment: comment,
+                confidence: data.confidence,
+                timestamp: new Date().toLocaleString()
+            };
+
+            history.unshift(item);
+            if (history.length > 10) history.pop();
+
+            updateHistory();
+            updateStats();
+        }
+
+        function updateHistory() {
+            const historyList = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p class="text-sm text-gray-500 text-center py-8">No analyses yet</p>';
+                return;
+            }
+
+            historyList.innerHTML = history.map(item => {
+                const confidenceColor = item.confidence >= 80 ? 'text-green-600' : item.confidence >= 60 ? 'text-yellow-600' : 'text-orange-600';
+                
+                return `
+                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer">
+                        <p class="text-xs font-medium text-blue-600 mb-1">${item.category}</p>
+                        <p class="text-xs text-gray-600 line-clamp-2 mb-2">${item.comment}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500">${item.timestamp}</span>
+                            <span class="text-xs font-semibold ${confidenceColor}">${item.confidence}%</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('analysisCount').textContent = history.length;
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/categories`);
+                const data = await response.json();
+                document.getElementById('totalCategories').textContent = data.total || 126;
+            } catch (error) {
+                console.error('Failed to load categories:', error);
+            }
+        }
+
+        // Initialize on load
+        loadConfig();
+    </script>
+</body>
+</html>
