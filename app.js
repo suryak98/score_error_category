@@ -50,6 +50,15 @@ function clearComment() {
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     try {
+        // Check if categories are loaded
+        if (typeof ERROR_CATEGORIES === 'undefined') {
+            console.error('CRITICAL: categories.js not loaded!');
+            alert('Error: Categories file not loaded. Please check that all files are uploaded correctly.');
+            return;
+        }
+        
+        console.log('Initialization: Categories loaded successfully -', ERROR_CATEGORIES.length, 'categories');
+        
         var totalCategoriesEl = document.getElementById('totalCategories');
         if (totalCategoriesEl) {
             totalCategoriesEl.textContent = ERROR_CATEGORIES.length;
@@ -280,27 +289,41 @@ function analyzeError() {
     setTimeout(function() {
         try {
             // Validate categories are loaded
-            if (!ERROR_CATEGORIES || ERROR_CATEGORIES.length === 0) {
-                throw new Error('Categories not loaded');
+            if (typeof ERROR_CATEGORIES === 'undefined') {
+                console.error('ERROR_CATEGORIES is undefined - categories.js not loaded');
+                throw new Error('Categories file not loaded. Please refresh the page.');
             }
+            
+            if (!ERROR_CATEGORIES || ERROR_CATEGORIES.length === 0) {
+                console.error('ERROR_CATEGORIES is empty');
+                throw new Error('No categories found. Please check the data file.');
+            }
+            
+            console.log('Categories loaded:', ERROR_CATEGORIES.length);
             
             var result = analyzeErrorComment(errorComment);
             
             // Validate result
-            if (!result || !result.category) {
-                throw new Error('Invalid analysis result');
+            if (!result) {
+                console.error('analyzeErrorComment returned null/undefined');
+                throw new Error('Analysis function failed');
             }
             
+            if (!result.category) {
+                console.error('Result has no category:', result);
+                throw new Error('No category assigned');
+            }
+            
+            console.log('Analysis successful:', result.category);
             displayResult(result, errorComment);
             addToHistory(result, errorComment);
         } catch (error) {
             var errorMsg = 'Analysis failed. Please try again.';
             if (error && error.message) {
                 console.error('Analysis error:', error.message);
-                // Show more specific error in development
-                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                    errorMsg = 'Error: ' + error.message;
-                }
+                console.error('Error stack:', error.stack);
+                // Show specific error message
+                errorMsg = 'Error: ' + error.message;
             }
             displayError(errorMsg);
         } finally {
