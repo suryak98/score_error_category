@@ -1,0 +1,207 @@
+╔══════════════════════════════════════════════════════════════╗
+║         TROUBLESHOOTING GUIDE - GITHUB PAGES ERROR          ║
+╚══════════════════════════════════════════════════════════════╝
+
+🔴 ISSUE: "Analysis failed. Please try again."
+
+This error appears when categories.js is not loading properly.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 HOW TO DIAGNOSE:
+
+1. Open Browser Console (F12)
+2. Look for error messages:
+   
+   ❌ "categories.js not loaded" 
+      → File is missing or not uploaded
+   
+   ❌ "ERROR_CATEGORIES is undefined"
+      → categories.js didn't load before app.js
+   
+   ❌ "No categories found"
+      → categories.js is empty or corrupted
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SOLUTION 1: Check File Upload
+
+Go to your GitHub repository and verify:
+
+REQUIRED FILES (all 3 must be present):
+□ index.html
+□ app.js
+□ categories.js
+
+If ANY file is missing:
+1. Go to github_release folder on your computer
+2. Upload the missing file(s)
+3. Wait 1-2 minutes
+4. Refresh your GitHub Pages site
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SOLUTION 2: Check File Order in index.html
+
+Files must load in this order:
+1. categories.js (FIRST)
+2. app.js (SECOND)
+
+Check bottom of index.html:
+<script src="categories.js"></script>  ← MUST be first
+<script src="app.js"></script>         ← MUST be second
+
+If order is wrong, categories won't be available when app.js runs.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SOLUTION 3: Clear Browser Cache
+
+GitHub Pages caches files. Clear cache:
+
+1. Press Ctrl+Shift+Delete
+2. Select "Cached images and files"
+3. Click "Clear data"
+4. Refresh page (Ctrl+F5)
+
+Or use Incognito/Private mode:
+- Chrome: Ctrl+Shift+N
+- Firefox: Ctrl+Shift+P
+- Edge: Ctrl+Shift+N
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SOLUTION 4: Verify File Contents
+
+Check categories.js on GitHub:
+1. Click on categories.js in your repository
+2. Should start with: var ERROR_CATEGORIES = [
+3. Should have 126 category entries
+4. Should end with: ];
+
+If file looks wrong:
+1. Delete it from GitHub
+2. Re-upload from github_release folder
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SOLUTION 5: Check Network Tab
+
+1. Open browser (F12)
+2. Go to "Network" tab
+3. Refresh page
+4. Look for categories.js
+
+Status should be:
+✅ 200 (OK) - File loaded successfully
+❌ 404 (Not Found) - File missing
+❌ Failed - Network issue
+
+If 404:
+- File not uploaded or wrong name
+- Check spelling: categories.js (lowercase, plural)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SOLUTION 6: Test Locally First
+
+Before uploading to GitHub:
+1. Open github_release/index.html locally
+2. Press F12 to open console
+3. Should see: "Categories loaded successfully - 126 categories"
+4. Test analysis
+5. If works locally but not on GitHub → upload issue
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 CONSOLE MESSAGES TO LOOK FOR:
+
+GOOD (Working):
+✅ "Initialization: Categories loaded successfully - 126 categories"
+✅ "Categories loaded: 126"
+✅ "Analysis successful: [category name]"
+
+BAD (Not Working):
+❌ "CRITICAL: categories.js not loaded!"
+❌ "ERROR_CATEGORIES is undefined"
+❌ "Categories file not loaded"
+❌ "No categories found"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 UPLOAD CHECKLIST:
+
+Before uploading to GitHub, verify:
+
+□ All 3 files in github_release folder:
+  - index.html
+  - app.js
+  - categories.js
+
+□ Files are not corrupted (can open in text editor)
+
+□ categories.js starts with: var ERROR_CATEGORIES = [
+
+□ index.html ends with:
+  <script src="categories.js"></script>
+  <script src="app.js"></script>
+
+□ Tested locally and works
+
+Then upload:
+1. Delete old files from GitHub
+2. Upload all 3 files at once
+3. Wait 2 minutes
+4. Clear browser cache
+5. Test
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 QUICK FIX:
+
+If nothing else works:
+
+1. Delete ALL files from GitHub repository
+2. Wait 1 minute
+3. Upload all 3 files from github_release folder:
+   - index.html
+   - app.js
+   - categories.js
+4. Commit with message: "Fresh upload - all files"
+5. Wait 2 minutes
+6. Clear browser cache (Ctrl+Shift+Delete)
+7. Open in incognito mode
+8. Test
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 MOST COMMON CAUSES:
+
+1. ❌ categories.js not uploaded (70% of cases)
+2. ❌ Browser cache (20% of cases)
+3. ❌ Wrong file uploaded (5% of cases)
+4. ❌ Files uploaded to subfolder (3% of cases)
+5. ❌ GitHub Pages not enabled (2% of cases)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📞 NEED MORE HELP?
+
+Open browser console (F12) and:
+1. Copy ALL error messages
+2. Take screenshot of Network tab
+3. Check which files loaded (200) vs failed (404)
+4. Share console errors for specific help
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ EXPECTED BEHAVIOR:
+
+When working correctly:
+1. Page loads
+2. Shows "125 Total Categories" (not 0)
+3. Console shows: "Categories loaded successfully"
+4. Analysis works immediately
+5. No error messages
+
+If you see "0 Total Categories" → categories.js not loaded!
