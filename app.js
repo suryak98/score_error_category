@@ -1,6 +1,34 @@
 // Application State
 var history = [];
 
+// Helper function to add class (Edge compatible)
+function addClass(element, className) {
+    if (!element) return;
+    if (element.classList) {
+        element.classList.add(className);
+    } else {
+        var classes = element.className.split(' ');
+        if (classes.indexOf(className) === -1) {
+            element.className += ' ' + className;
+        }
+    }
+}
+
+// Helper function to remove class (Edge compatible)
+function removeClass(element, className) {
+    if (!element) return;
+    if (element.classList) {
+        element.classList.remove(className);
+    } else {
+        var classes = element.className.split(' ');
+        var index = classes.indexOf(className);
+        if (index !== -1) {
+            classes.splice(index, 1);
+            element.className = classes.join(' ');
+        }
+    }
+}
+
 // Clear comment function
 function clearComment() {
     var errorCommentEl = document.getElementById('errorComment');
@@ -15,7 +43,7 @@ function clearComment() {
         charCountEl.textContent = '0';
     }
     if (resultCard) {
-        resultCard.classList.add('hidden');
+        addClass(resultCard, 'hidden');
     }
 }
 
@@ -245,8 +273,8 @@ function analyzeError() {
     
     if (btn) btn.disabled = true;
     if (btnText) btnText.textContent = 'Analyzing...';
-    if (sendIcon) sendIcon.classList.add('hidden');
-    if (loadingIcon) loadingIcon.classList.remove('hidden');
+    if (sendIcon) addClass(sendIcon, 'hidden');
+    if (loadingIcon) removeClass(loadingIcon, 'hidden');
 
     // Simulate processing delay for better UX
     setTimeout(function() {
@@ -278,8 +306,8 @@ function analyzeError() {
         } finally {
             if (btn) btn.disabled = false;
             if (btnText) btnText.textContent = 'Analyze Error';
-            if (sendIcon) sendIcon.classList.remove('hidden');
-            if (loadingIcon) loadingIcon.classList.add('hidden');
+            if (sendIcon) removeClass(sendIcon, 'hidden');
+            if (loadingIcon) addClass(loadingIcon, 'hidden');
         }
     }, 300);
 }
@@ -341,7 +369,7 @@ function displayResult(data, comment) {
             alternativesHtml +
         '</div>';
 
-    resultCard.classList.remove('hidden');
+    removeClass(resultCard, 'hidden');
 }
 
 // Display error
@@ -359,7 +387,7 @@ function displayError(message) {
             '<p class="font-medium">' + message + '</p>' +
         '</div>';
     
-    resultCard.classList.remove('hidden');
+    removeClass(resultCard, 'hidden');
 }
 
 // Add to history
