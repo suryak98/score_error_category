@@ -25,11 +25,23 @@ class QAIntelligenceApp {
     }
 
     async analyzeComments() {
-        const comments = document.getElementById('auditorComments').value.trim();
+        const commentsTextarea = document.getElementById('auditorComments');
+        const comments = commentsTextarea.value.trim();
         
         if (!comments) {
             alert('Please enter auditor comments before analyzing.');
             return;
+        }
+
+        // Mask PHI in the textarea
+        const maskedComments = errorCategoryAI.maskPHI(comments);
+        const phiWasMasked = maskedComments !== comments;
+        
+        commentsTextarea.value = maskedComments;
+
+        // Show PHI notice if masking occurred
+        if (phiWasMasked) {
+            document.getElementById('phiNotice').style.display = 'flex';
         }
 
         // Show processing indicator
@@ -39,8 +51,8 @@ class QAIntelligenceApp {
         // Simulate AI processing delay for better UX
         await this.delay(800);
 
-        // Get AI predictions (no scenario)
-        const predictions = errorCategoryAI.predictCategories(comments, null);
+        // Get AI predictions using masked comments
+        const predictions = errorCategoryAI.predictCategories(maskedComments, null);
 
         // Display results
         this.displayResults(predictions);
@@ -117,6 +129,9 @@ class QAIntelligenceApp {
     clearAll() {
         // Clear textarea
         document.getElementById('auditorComments').value = '';
+
+        // Hide PHI notice
+        document.getElementById('phiNotice').style.display = 'none';
 
         // Hide result section
         this.hideSuggestions();

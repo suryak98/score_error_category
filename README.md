@@ -5,10 +5,16 @@ An intelligent, AI-powered quality assurance review system that automatically su
 ## 🎯 Features
 
 - **AI-Powered Predictions**: Automatically suggests the most relevant error categories based on auditor comments
-- **Smart Categorization**: 
-  - Primary error category (excludes WRK categories)
-  - Secondary error category (WRK categories preferred)
+- **Smart Categorization** (v1.3.0): 
+  - Categories ranked by **confidence score**, not type
+  - Primary = Highest confidence (can be any category type)
+  - Secondary = Second highest confidence
   - Alternative category suggestions (up to 5)
+- **🔒 Automatic PHI Masking** (v1.3.0 NEW!):
+  - Detects and masks 15+ types of Protected Health Information
+  - DCN, UM numbers, INQ IDs, Member IDs, SSN, Phone, DOB, etc.
+  - Visual notification when PHI is masked
+  - HIPAA compliance built-in
 - **AI Caution Message**: Clear warning displayed at the end of results that recommendations are AI-generated and should be reviewed
 - **Confidence Scoring**: Each suggestion includes a confidence percentage (45%-95%)
 - **User-Friendly Interface**: Clean, modern UI with responsive design

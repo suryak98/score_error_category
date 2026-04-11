@@ -155,6 +155,7 @@ h2 {
     padding: 25px;
     border-radius: 12px;
     box-shadow: var(--shadow-md);
+    margin-bottom: 20px;
 }
 
 #auditorComments {
@@ -172,6 +173,41 @@ h2 {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* PHI Notice */
+.phi-notice {
+    background: #e0f2fe;
+    border: 2px solid #0284c7;
+    border-left: 5px solid #0284c7;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin: 15px 0;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    gap: 10px;
+    -webkit-animation: fadeIn 0.3s ease;
+    -moz-animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.3s ease;
+}
+
+.phi-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.phi-text {
+    color: #075985;
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .button-group {

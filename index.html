@@ -22,6 +22,10 @@
                     placeholder="Enter detailed comments about the error or issue found during the audit..."
                     rows="6"
                 ></textarea>
+                <div class="phi-notice" id="phiNotice" style="display: none;">
+                    <span class="phi-icon">🔒</span>
+                    <span class="phi-text">PHI data has been automatically masked for privacy protection</span>
+                </div>
                 <div class="button-group">
                     <button id="analyzeBtn" class="primary-btn">
                         🔍 Analyze & Suggest Categories
@@ -85,8 +89,8 @@
         </footer>
     </div>
 
-    <script src="errorCategories.js?v=1.2.1"></script>
-    <script src="aiModel.js?v=1.2.1"></script>
-    <script src="app.js?v=1.2.1"></script>
+    <script src="errorCategories.js?v=1.3.0"></script>
+    <script src="aiModel.js?v=1.3.0"></script>
+    <script src="app.js?v=1.3.0"></script>
 </body>
 </html>

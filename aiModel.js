@@ -213,37 +213,23 @@ class ErrorCategoryAI {
         return null;
     }
 
-    // Get secondary category (WRK preferred, but not required)
+    // Get secondary category (prioritize by confidence, not just WRK)
     getSecondaryCategory(sortedCategories, primary) {
-        // First try to find a WRK category
-        const wrkCategories = sortedCategories.filter(([cat, _]) => 
-            isWRKCategory(cat) && cat !== primary?.category
+        // Get all categories except primary, sorted by score
+        const candidates = sortedCategories.filter(([cat, _]) => 
+            cat !== primary?.category
         );
 
-        if (wrkCategories.length > 0) {
-            const [category, score] = wrkCategories[0];
-            return {
-                category,
-                confidence: this.calculateConfidence(score),
-                description: this.getCategoryDescription(category)
-            };
-        }
+        if (candidates.length === 0) return null;
 
-        // If no WRK, get second highest non-WRK
-        const alternatives = sortedCategories.filter(([cat, _]) => 
-            cat !== primary?.category && !isWRKCategory(cat)
-        );
-
-        if (alternatives.length > 0) {
-            const [category, score] = alternatives[0];
-            return {
-                category,
-                confidence: this.calculateConfidence(score),
-                description: this.getCategoryDescription(category)
-            };
-        }
-
-        return null;
+        // Get the highest scoring category (could be WRK or non-WRK)
+        const [category, score] = candidates[0];
+        
+        return {
+            category,
+            confidence: this.calculateConfidence(score),
+            description: this.getCategoryDescription(category)
+        };
     }
 
     // Get alternative categories
@@ -275,6 +261,64 @@ class ErrorCategoryAI {
         const group = getCategoryGroup(category);
         const prefix = getCategoryPrefix(category);
         return `${group} (${prefix}) - ${category.split('-').slice(1).join('-')}`;
+    }
+
+    // Mask PHI (Protected Health Information) in text
+    maskPHI(text) {
+        let maskedText = text;
+
+        // Pattern definitions for various PHI types
+        const phiPatterns = [
+            // DCN (Document Control Number) - various formats
+            { pattern: /\b(DCN|dcn)[:\s#-]*([A-Z0-9]{8,20})\b/gi, replacement: '$1: ####' },
+            { pattern: /\b([0-9]{10,20})\b/g, replacement: '####' }, // Long numeric IDs
+            
+            // UM Number (Utilization Management / Authorization)
+            { pattern: /\b(UM|um|auth|authorization|AUTH)[:\s#-]*([A-Z0-9]{6,20})\b/gi, replacement: '$1: ####' },
+            
+            // INQ ID (Inquiry ID)
+            { pattern: /\b(INQ|inq|inquiry)[:\s#-]*(ID|id)?[:\s#-]*([A-Z0-9]{6,20})\b/gi, replacement: '$1 ID: ####' },
+            
+            // Member ID / Subscriber ID
+            { pattern: /\b(member|subscriber|patient)[:\s#-]*(ID|id|number|num)?[:\s#-]*([A-Z0-9]{6,20})\b/gi, replacement: '$1 ID: ####' },
+            
+            // Claim Number
+            { pattern: /\b(claim|CLM|clm)[:\s#-]*(number|num|no)?[:\s#-]*([A-Z0-9]{6,20})\b/gi, replacement: '$1 number: ####' },
+            
+            // Reference Number
+            { pattern: /\b(ref|reference|REF)[:\s#-]*(number|num|no)?[:\s#-]*([A-Z0-9]{6,20})\b/gi, replacement: '$1 number: ####' },
+            
+            // SSN (Social Security Number) - various formats
+            { pattern: /\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/g, replacement: '###-##-####' },
+            
+            // Phone numbers
+            { pattern: /\b\d{3}[-\s\.]?\d{3}[-\s\.]?\d{4}\b/g, replacement: '###-###-####' },
+            
+            // Date of Birth patterns
+            { pattern: /\b(DOB|dob|birth date|birthdate)[:\s#-]*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})\b/gi, replacement: '$1: ##/##/####' },
+            
+            // Email addresses
+            { pattern: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, replacement: '####@####.com' },
+            
+            // Provider NPI
+            { pattern: /\b(NPI|npi)[:\s#-]*([0-9]{10})\b/gi, replacement: '$1: ####' },
+            
+            // Tax ID / TIN
+            { pattern: /\b(TIN|tin|tax id)[:\s#-]*([0-9]{9})\b/gi, replacement: '$1: ####' },
+            
+            // Medical Record Number
+            { pattern: /\b(MRN|mrn|medical record)[:\s#-]*(number|num)?[:\s#-]*([A-Z0-9]{6,20})\b/gi, replacement: '$1: ####' },
+            
+            // Account Number
+            { pattern: /\b(account|acct)[:\s#-]*(number|num|no)?[:\s#-]*([A-Z0-9]{6,20})\b/gi, replacement: '$1 number: ####' },
+        ];
+
+        // Apply all patterns
+        phiPatterns.forEach(({ pattern, replacement }) => {
+            maskedText = maskedText.replace(pattern, replacement);
+        });
+
+        return maskedText;
     }
 }
 
