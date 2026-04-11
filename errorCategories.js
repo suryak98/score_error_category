@@ -103,7 +103,6 @@ const ERROR_CATEGORIES = [
     "PRC-Systems Other",
     "PRC-Vision",
     "SYS-System",
-    "VND-Out of Scope (Vendor Only)",
     "WRK-Addl Info (Needed/Not Used)",
     "WRK-Adjustment Incorrect/Incomplete",
     "WRK-Adjustment Reason Code",
@@ -143,7 +142,6 @@ const CATEGORY_PREFIXES = {
     'PMT': 'Payment',
     'PRC': 'Pricing',
     'SYS': 'System',
-    'VND': 'Vendor',
     'WRK': 'Workflow/Work Process'
 };
 
