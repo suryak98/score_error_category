@@ -1,4 +1,4 @@
-// Error Categories Data (125 categories from CSV)
+// Error Categories Data (124 categories)
 const ERROR_CATEGORIES = [
     "ACU-Embedded/Non Embedded",
     "ACU-Incorrect Year/Contract/Member Worked",

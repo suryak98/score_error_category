@@ -17,7 +17,7 @@ An intelligent, AI-powered quality assurance review system that automatically su
 
 ## 📋 Error Categories
 
-The system includes 125 predefined error categories across multiple domains:
+The system includes 124 predefined error categories across multiple domains:
 
 - **ACU** - Accumulator
 - **BEN** - Benefits
