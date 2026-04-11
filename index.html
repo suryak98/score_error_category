@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Intelligence - AI Quality Review System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 QA Intelligence</h1>
+            <p class="subtitle">AI-Powered Quality Assurance Review System</p>
+        </header>
+
+        <main>
+            <!-- Auditor Comments Input -->
+            <section class="input-section">
+                <h2>Auditor Comments</h2>
+                <textarea 
+                    id="auditorComments" 
+                    placeholder="Enter detailed comments about the error or issue found during the audit..."
+                    rows="6"
+                ></textarea>
+                <div class="button-group">
+                    <button id="analyzeBtn" class="primary-btn">
+                        🔍 Analyze & Suggest Categories
+                    </button>
+                    <button id="clearBtn" class="secondary-btn">
+                        🗑️ Clear
+                    </button>
+                </div>
+            </section>
+
+            <!-- AI Suggestions -->
+            <section class="suggestions-section" id="suggestionsSection" style="display: none;">
+                <h2>AI-Suggested Error Categories</h2>
+                
+                <!-- Primary Category -->
+                <div class="category-card primary-card">
+                    <div class="card-header">
+                        <h3>Primary Error Category</h3>
+                        <span class="confidence-badge" id="primaryConfidence"></span>
+                    </div>
+                    <div class="category-result" id="primaryCategory"></div>
+                    <div class="category-description" id="primaryDescription"></div>
+                </div>
+
+                <!-- Secondary Category -->
+                <div class="category-card secondary-card">
+                    <div class="card-header">
+                        <h3>Secondary Error Category</h3>
+                        <span class="confidence-badge" id="secondaryConfidence"></span>
+                    </div>
+                    <div class="category-result" id="secondaryCategory"></div>
+                    <div class="category-description" id="secondaryDescription"></div>
+                </div>
+
+                <!-- Alternative Categories -->
+                <div class="category-card alternatives-card">
+                    <div class="card-header">
+                        <h3>Alternative Categories</h3>
+                    </div>
+                    <div class="alternatives-list" id="alternativesList"></div>
+                </div>
+
+                <!-- AI Caution Message (At the end) -->
+                <div class="caution-message">
+                    <span class="caution-icon">⚠️</span>
+                    <div class="caution-text">
+                        <strong>AI-Generated Recommendation:</strong> This error category is AI-generated based on the entered comments and may be incorrect. Please review before confirming.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Processing Indicator -->
+            <div class="processing" id="processingIndicator" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing comments with AI...</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2026 QA Intelligence | AI-Powered Quality Assurance</p>
+        </footer>
+    </div>
+
+    <script src="errorCategories.js"></script>
+    <script src="aiModel.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
